@@ -43,6 +43,23 @@ def print_line_in_slow(string, lag):
 			print(line, end='\n')
 			sys.stdout.flush()
 
+def apply_5050_lifeline(options, answer):
+    incorrect_answers = [opt for opt, ans in zip(options, QAns) if ans != answer]
+    options_to_remove = random.sample(incorrect_answers, 2)
+    
+    for opt in options_to_remove:
+        options.remove(opt)
+    
+    return options
+
+def apply_ask_the_audience_lifeline(options):
+    audience_opinion = [random.randint(40, 100) for _ in options]
+    total_opinion = sum(audience_opinion)
+    normalized_opinions = [opinion / total_opinion for opinion in audience_opinion]
+    
+    selected_option = random.choices(options, normalized_opinions)[0]
+    return selected_option
+
 def generator():
 	for question, options, answer, amount in zip(GameQ, QOpt, QAns, am):
 		yield (question, options, answer, amount)
@@ -55,16 +72,34 @@ print_in_slow(Introduction, 0.05)
 input()
 os.system('cls')
 print_in_slow("Welcome to KBC Game🕵️‍\n\n", 0.1)
+
 for i in range(1, LengthOfGame+1):
-	question, options, answer, amount = next(everything)
-	print_in_slow(f'Question Number {i}', 0.06)
-	print()
-	print_in_slow(question, 0.07)
-	print()
-	print_line_in_slow(options, 0.9)
-	print()
-	choice = str(input('Enter your option: '))
-	choice = choice.strip().lower()
+    question, options, answer, amount = next(everything)
+    print_in_slow(f'Question Number {i}', 0.06)
+    print()
+    print_in_slow(question, 0.07)
+    print()
+    print_line_in_slow(options, 0.9)
+    print()
+    choice = str(input('Enter your option: '))
+    choice = choice.strip().lower()
+    
+    if choice == 'l':
+        options = apply_5050_lifeline(options, answer)
+        print_line_in_slow("50:50 Lifeline used! The remaining options are:", 0.07)
+        print_line_in_slow(" ".join(options), 0.9)
+    elif choice == 'a':
+        selected_option = apply_ask_the_audience_lifeline(options)
+        print_line_in_slow(f"The audience suggests option {selected_option.upper()}!", 0.07)
+   
+    while choice not in 'abcdq' or choice == '':
+        print('Not a valid option\nTry Again\n')
+        choice = str(input('Enter your option: '))
+        choice = choice.strip().lower()
+    # Rest of the code remains the same
+
+  
+  
 	while choice not in 'abcdq' or choice == '':
 		print('Not a valid option\nTry Again\n')
 		choice = str(input('Enter your option: '))
